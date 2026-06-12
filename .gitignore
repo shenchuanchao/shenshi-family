@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.next/
+build/
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
