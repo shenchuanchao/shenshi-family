@@ -44,7 +44,7 @@ export default function ContactPage() {
                     <div>
                       <p className="text-sm font-medium">电子邮箱</p>
                       <p className="text-sm text-muted-foreground">
-                        contact@shenshi-culture.com
+                        shanchuanchao99@sina.com
                       </p>
                     </div>
                   </div>

@@ -105,7 +105,7 @@ export default function PrivacyPage() {
 
             <div className="rounded-xl bg-cream p-6 text-center text-sm text-muted-foreground">
               如有任何关于隐私政策的问题，请通过{" "}
-              <span className="text-dai-green">contact@shenshi-culture.com</span>{" "}
+              <span className="text-dai-green">shanchuanchao99@sina.com</span>{" "}
               与我们联系。
             </div>
           </div>
