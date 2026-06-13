@@ -85,6 +85,8 @@ async function getLatestArticles(): Promise<Article[]> {
   }
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const articles = await getLatestArticles();
 

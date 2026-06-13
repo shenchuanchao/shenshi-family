@@ -4,6 +4,8 @@ import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { getArticles } from "@/lib/api";
 import { CelebritiesClient } from "./celebrities-client";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "名人堂",
   description: "探索沈氏历史上的杰出人物，了解沈氏先贤的生平与贡献。",

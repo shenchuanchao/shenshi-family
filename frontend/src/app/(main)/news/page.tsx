@@ -7,6 +7,8 @@ import NewsClient from "./news-client";
 
 const PAGE_SIZE = 9;
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "最新动态",
   description: "沈氏文化家园最新新闻与动态，了解沈氏宗族最新资讯。",

@@ -4,6 +4,8 @@ import { getArticles } from "@/lib/api";
 import type { Article } from "@/lib/types";
 import FamilyRulesClient from "./family-rules-client";
 
+export const dynamic = "force-dynamic";
+
 export default async function FamilyRulesPage() {
   const res = await getArticles({ category: "family_rules", limit: 50 });
   const articles: Article[] = res.data ?? [];

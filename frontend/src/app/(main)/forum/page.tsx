@@ -5,6 +5,8 @@ import { getForumPosts } from "@/lib/api";
 import type { ForumPost } from "@/lib/types";
 import ForumClient from "./forum-client";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "留言墙",
   description: "与全球沈氏宗亲交流互动，分享家族故事与心得。",

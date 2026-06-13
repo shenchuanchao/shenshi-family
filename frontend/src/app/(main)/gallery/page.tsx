@@ -6,6 +6,8 @@ import GalleryClient from "./gallery-client";
 
 const PAGE_SIZE = 12;
 
+export const dynamic = "force-dynamic";
+
 export default async function GalleryPage() {
   const res = await getGalleryImages({ page: 1, limit: PAGE_SIZE });
   const images: GalleryImage[] = res.data ?? [];

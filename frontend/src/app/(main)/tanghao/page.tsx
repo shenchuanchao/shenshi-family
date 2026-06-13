@@ -6,6 +6,8 @@ import {
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { getTanghaoList } from "@/lib/api";
 
+export const dynamic = "force-dynamic";
+
 export default async function TanghaoPage() {
   let tanghaos: import("@/lib/types").Tanghao[] = [];
   try {
