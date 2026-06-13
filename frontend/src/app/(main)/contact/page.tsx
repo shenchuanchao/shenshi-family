@@ -5,6 +5,7 @@ import { Breadcrumb } from "@/components/ui/breadcrumb";
 export const metadata: Metadata = {
   title: "联系方式",
   description: "联系沈氏文化家园团队，欢迎提出建议与合作意向。",
+  keywords: ["沈氏文化家园", "联系我们", "沈氏宗亲会"],
 };
 
 export default function ContactPage() {

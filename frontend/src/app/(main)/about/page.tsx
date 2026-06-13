@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { BookOpen, Heart, Globe, Users } from "lucide-react";
 import type { Metadata } from "next";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
@@ -5,6 +6,7 @@ import { Breadcrumb } from "@/components/ui/breadcrumb";
 export const metadata: Metadata = {
   title: "关于我们",
   description: "了解沈氏文化家园的使命与愿景，我们致力于传承沈氏文化、连接全球宗亲。",
+  keywords: ["沈氏文化家园", "沈氏文化", "宗亲会", "沈氏介绍", "关于我们"],
 };
 
 export default function AboutPage() {
@@ -16,9 +18,13 @@ export default function AboutPage() {
       <section className="bg-gradient-to-b from-cream to-background py-16 md:py-20">
         <div className="container px-4 md:px-6">
           <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-4 inline-flex size-14 items-center justify-center rounded-full bg-dai-green/10">
-              <BookOpen className="size-7 text-dai-green" />
-            </div>
+            <Image
+              src="/img/emblem-wood.webp"
+              alt="沈氏三善"
+              width={140}
+              height={140}
+              className="mx-auto mb-4"
+            />
             <h1 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
               关于我们
             </h1>

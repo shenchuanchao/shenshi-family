@@ -1,39 +1,18 @@
-"use client";
-
-import { useEffect, useState, useCallback } from "react";
 import { Landmark } from "lucide-react";
 import {
   Card,
   CardContent,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { getTanghaoList } from "@/lib/api";
-import type { Tanghao } from "@/lib/types";
 
-/* ------------------------------------------------------------------ */
-/* Component                                                           */
-/* ------------------------------------------------------------------ */
-
-export default function TanghaoPage() {
-  const [tanghaos, setTanghaos] = useState<Tanghao[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchTanghaos = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await getTanghaoList();
-      setTanghaos(data ?? []);
-    } catch {
-      setTanghaos([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchTanghaos();
-  }, [fetchTanghaos]);
+export default async function TanghaoPage() {
+  let tanghaos: import("@/lib/types").Tanghao[] = [];
+  try {
+    tanghaos = (await getTanghaoList()) ?? [];
+  } catch {
+    tanghaos = [];
+  }
 
   return (
     <div className="flex flex-col">
@@ -58,35 +37,15 @@ export default function TanghaoPage() {
       {/* Content */}
       <section className="py-10 md:py-14">
         <div className="container px-4 md:px-6">
-          {/* Loading */}
-          {loading && (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Card key={i}>
-                  <CardContent className="space-y-4 py-6">
-                    <Skeleton className="h-8 w-1/2" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-5/6" />
-                    <Skeleton className="h-4 w-3/4" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-
-          {/* Grid */}
-          {!loading && tanghaos.length > 0 && (
+          {tanghaos.length > 0 ? (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {tanghaos.map((tanghao) => (
                 <Card
                   key={tanghao.name}
                   className="overflow-hidden transition-shadow hover:shadow-lg group/tanghao"
                 >
-                  {/* Warm-wood decorative top border */}
                   <div className="h-1.5 bg-gradient-to-r from-warm-wood via-warm-wood-light to-warm-wood" />
-
                   <CardContent className="py-6">
-                    {/* Tanghao name with decorative frame */}
                     <div className="mb-4 flex items-start gap-3">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border-2 border-warm-wood/30 bg-warm-wood/8 group-hover/tanghao:border-warm-wood/60 transition-colors">
                         <Landmark className="h-5 w-5 text-warm-wood" />
@@ -95,37 +54,24 @@ export default function TanghaoPage() {
                         {tanghao.name}
                       </h3>
                     </div>
-
-                    {/* Decorative divider */}
                     <div className="mb-4 flex items-center gap-2">
                       <div className="h-px flex-1 bg-warm-wood/20" />
                       <div className="h-1.5 w-1.5 rounded-full bg-warm-wood/40" />
                       <div className="h-px flex-1 bg-warm-wood/20" />
                     </div>
-
-                    {/* Description */}
                     <p className="text-sm leading-relaxed text-muted-foreground">
                       {tanghao.description}
                     </p>
                   </CardContent>
-
-                  {/* Warm-wood decorative bottom border */}
                   <div className="h-0.5 bg-gradient-to-r from-transparent via-warm-wood/30 to-transparent" />
                 </Card>
               ))}
             </div>
-          )}
-
-          {/* Empty */}
-          {!loading && tanghaos.length === 0 && (
+          ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <Landmark className="h-12 w-12 text-muted-foreground/40" />
-              <h3 className="mt-4 font-heading text-lg font-medium">
-                暂无堂号信息
-              </h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                堂号资料正在整理中，敬请期待
-              </p>
+              <h3 className="mt-4 font-heading text-lg font-medium">暂无堂号信息</h3>
+              <p className="mt-2 text-sm text-muted-foreground">堂号资料正在整理中，敬请期待</p>
             </div>
           )}
         </div>

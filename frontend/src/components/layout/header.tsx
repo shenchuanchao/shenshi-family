@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, User, LogOut, Settings, Send } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -42,6 +43,13 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between px-4 md:px-6">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
+          <Image
+            src="/img/logo-bird.webp"
+            alt="沈氏文化家园"
+            width={36}
+            height={36}
+            className="h-9 w-9"
+          />
           <span className="text-xl font-bold font-heading text-dai-green">
             沈氏文化家园
           </span>

@@ -1,10 +1,18 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export function Footer() {
   return (
     <footer className="border-t bg-cream">
       <div className="container px-4 py-6 md:px-6">
         <div className="flex flex-col items-center gap-4 text-center">
+          <Image
+            src="/img/logo-bird-gray.webp"
+            alt="沈氏文化家园"
+            width={40}
+            height={40}
+            className="h-10 w-10 opacity-60"
+          />
           <nav className="flex flex-wrap justify-center gap-6">
             <Link
               href="/about"

@@ -5,6 +5,7 @@ import { Breadcrumb } from "@/components/ui/breadcrumb";
 export const metadata: Metadata = {
   title: "隐私政策",
   description: "沈氏文化家园隐私政策，了解我们如何保护您的个人信息。",
+  keywords: ["沈氏文化家园", "隐私政策"],
 };
 
 export default function PrivacyPage() {

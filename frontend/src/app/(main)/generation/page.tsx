@@ -178,7 +178,7 @@ export default function GenerationPage() {
   }, [city, county]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Build location label for forum post title
-  const locationLabel = [province ? formatProvince(province) : "", city, county]
+  const locationLabel = [province || "", city, county]
     .filter(Boolean)
     .join("");
   const forumHelpTitle = `求${locationLabel}沈氏字辈信息`;
@@ -222,7 +222,7 @@ export default function GenerationPage() {
                   {Object.entries(PROVINCE_GROUPS).map(([group, items]) => (
                     <optgroup key={group} label={`── ${group} ──`}>
                       {items.map((p) => (
-                        <option key={p} value={p}>
+                        <option key={p} value={formatProvince(p)}>
                           {formatProvince(p)}
                         </option>
                       ))}
@@ -332,7 +332,7 @@ export default function GenerationPage() {
           {!loading && results.length > 0 && (
             <>
               <p className="mb-6 text-sm text-muted-foreground">
-                {formatProvince(province)}
+                {province}
                 {city ? ` · ${city}` : ""}
                 {county ? ` · ${county}` : ""}
                 {query ? ` · 搜索"${query}"` : " · 全部字辈"}
@@ -420,12 +420,12 @@ export default function GenerationPage() {
           <h2 className="mb-6 text-center font-heading text-xl font-semibold md:text-2xl">
             各省份沈氏字辈大全
           </h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-2">
             {ALL_PROVINCES.map((p) => (
               <Link
                 key={p}
-                href={`/generation/${encodeURIComponent(p)}`}
-                className="rounded-lg border bg-background px-3 py-2.5 text-center text-sm transition-colors hover:border-dai-green hover:text-dai-green"
+                href={`/generation/${encodeURIComponent(formatProvince(p))}`}
+                className="text-sm transition-colors hover:text-dai-green"
               >
                 {formatProvince(p)}沈氏字辈
               </Link>
@@ -433,6 +433,7 @@ export default function GenerationPage() {
           </div>
         </div>
       </section>
+
     </div>
   );
 }

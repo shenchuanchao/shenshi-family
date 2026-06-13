@@ -1,65 +1,47 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { BookOpen, MapPin, ArrowLeft } from "lucide-react";
+import { BookOpen, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import type { Metadata } from "next";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { queryGenerationVerse } from "@/lib/api";
 import type { GenerationVerse } from "@/lib/types";
 
-const MUNICIPALITIES = new Set(["上海", "北京", "天津", "重庆"]);
+/* ------------------------------------------------------------------ */
+/* Dynamic Metadata                                                    */
+/* ------------------------------------------------------------------ */
 
-function formatProvince(base: string): string {
-  if (MUNICIPALITIES.has(base)) return `${base}市`;
-  if (base === "内蒙古") return "内蒙古自治区";
-  if (base === "广西") return "广西壮族自治区";
-  if (base === "西藏") return "西藏自治区";
-  if (base === "宁夏") return "宁夏回族自治区";
-  if (base === "新疆") return "新疆维吾尔自治区";
-  if (base === "香港") return "香港特别行政区";
-  if (base === "澳门") return "澳门特别行政区";
-  return `${base}省`;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ province: string }>;
+}): Promise<Metadata> {
+  const { province } = await params;
+  const p = decodeURIComponent(province);
+  return {
+    title: `${p}沈氏字辈大全`,
+    description: `${p}沈氏字辈大全，收录${p}地区各支系沈氏字辈信息，查询您的辈分与家族渊源。`,
+    keywords: [`${p}沈氏字辈`, "沈氏字辈大全", "字辈查询", `${p}沈氏`, "沈氏家谱"],
+  };
 }
 
-export default function ProvinceVersePage() {
-  const params = useParams<{ province: string }>();
-  const province = decodeURIComponent(params.province ?? "");
+/* ------------------------------------------------------------------ */
+/* Page Component (Server Component — data fetched during SSR)        */
+/* ------------------------------------------------------------------ */
 
-  const [results, setResults] = useState<GenerationVerse[]>([]);
-  const [loading, setLoading] = useState(true);
+export default async function ProvinceVersePage({
+  params,
+}: {
+  params: Promise<{ province: string }>;
+}) {
+  const { province } = await params;
+  const decodedProvince = decodeURIComponent(province);
 
-  useEffect(() => {
-    if (!province) return;
-    async function fetch() {
-      setLoading(true);
-      try {
-        const data = await queryGenerationVerse({ province });
-        setResults(data ?? []);
-      } catch {
-        setResults([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetch();
-  }, [province]);
-
-  useEffect(() => {
-    if (province) {
-      document.title = `${formatProvince(province)}沈氏字辈大全 | 沈氏文化家园`;
-    }
-  }, [province]);
-
-  const displayName = formatProvince(province);
+  let results: GenerationVerse[] = [];
+  try {
+    results = (await queryGenerationVerse({ province: decodedProvince })) ?? [];
+  } catch {
+    results = [];
+  }
 
   return (
     <div className="flex flex-col">
@@ -67,109 +49,80 @@ export default function ProvinceVersePage() {
         <Breadcrumb
           items={[
             { label: "字辈查询", href: "/generation" },
-            { label: `${displayName}沈氏字辈大全` },
+            { label: `${decodedProvince}沈氏字辈大全` },
           ]}
         />
       </div>
 
       {/* Hero */}
-      <section className="bg-gradient-to-b from-cream to-background py-10 md:py-14">
+      <section className="bg-gradient-to-b from-cream to-background py-8 md:py-12">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center text-center">
-            <BookOpen className="h-10 w-10 text-dai-green" />
-            <h1 className="mt-4 font-heading text-3xl font-bold tracking-tight md:text-4xl">
-              {displayName}沈氏字辈大全
+            <BookOpen className="h-8 w-8 text-dai-green" />
+            <h1 className="mt-3 font-heading text-2xl font-bold tracking-tight md:text-3xl">
+              {decodedProvince}沈氏字辈大全
             </h1>
-            <p className="mt-3 max-w-xl text-muted-foreground">
-              收录{displayName}地区各支系沈氏字辈信息
+            <p className="mt-2 text-sm text-muted-foreground">
+              收录{decodedProvince}地区各支系沈氏字辈信息
             </p>
           </div>
         </div>
       </section>
 
       {/* Content */}
-      <section className="py-8 md:py-12">
-        <div className="container max-w-4xl px-4 md:px-6">
-          {/* Loading */}
-          {loading && (
-            <div className="space-y-4">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Card key={i}>
-                  <CardHeader>
-                    <Skeleton className="h-5 w-1/3" />
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-2/3" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-
+      <section className="py-6 md:py-10">
+        <div className="container max-w-3xl px-4 md:px-6">
           {/* Results */}
-          {!loading && results.length > 0 && (
+          {results.length > 0 && (
             <>
-              <p className="mb-6 text-sm text-muted-foreground">
+              <p className="mb-4 text-sm text-muted-foreground">
                 共收录 {results.length} 条字辈信息
               </p>
-              <div className="space-y-4">
-                {results.map((item, idx) => (
-                  <Card
-                    key={item.id}
-                    className="overflow-hidden border-l-4 border-l-dai-green"
-                  >
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="font-heading text-lg">
-                          {item.branch_name}
-                        </CardTitle>
-                        <span className="text-xs text-muted-foreground">
-                          #{idx + 1}
+              <div className="space-y-3 text-[15px] leading-7">
+                {results.map((item, idx) => {
+                  const location =
+                    [item.province, item.city, item.county]
+                      .filter(Boolean)
+                      .join(" ") || item.region || "";
+                  return (
+                    <p key={item.id}>
+                      <span className="mr-1 font-medium text-muted-foreground">
+                        {idx + 1}.
+                      </span>
+                      <span className="font-heading font-semibold">
+                        {item.branch_name}
+                      </span>
+                      <span className="mx-1">：</span>
+                      <span className="text-dai-green">{item.verses}</span>
+                      {location && (
+                        <span className="text-muted-foreground">
+                          （{location}）
                         </span>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="rounded-lg bg-cream p-3">
-                        <p className="font-heading text-base leading-relaxed text-dai-green">
-                          {item.verses}
-                        </p>
-                      </div>
-                      {(item.province || item.city || item.county || item.region) && (
-                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                          <MapPin className="h-3.5 w-3.5 text-warm-wood" />
-                          {[item.province, item.city, item.county]
-                            .filter(Boolean)
-                            .join(" ") || item.region}
-                        </div>
                       )}
                       {item.description && (
-                        <p className="text-sm leading-relaxed text-muted-foreground">
-                          {item.description}
-                        </p>
+                        <span className="text-muted-foreground">
+                          ——{item.description}
+                        </span>
                       )}
-                    </CardContent>
-                  </Card>
-                ))}
+                    </p>
+                  );
+                })}
               </div>
             </>
           )}
 
           {/* Empty */}
-          {!loading && results.length === 0 && (
-            <div className="flex flex-col items-center py-20 text-center">
-              <BookOpen className="h-12 w-12 text-muted-foreground/30" />
-              <p className="mt-4 text-lg font-medium text-muted-foreground">
-                暂无数据
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground/70">
-                {displayName}地区暂未收录字辈信息
+          {results.length === 0 && (
+            <div className="flex flex-col items-center py-16 text-center">
+              <BookOpen className="h-10 w-10 text-muted-foreground/30" />
+              <p className="mt-4 text-muted-foreground">
+                {decodedProvince}地区暂未收录字辈信息
               </p>
             </div>
           )}
 
           {/* Back Link */}
-          <div className="mt-10 text-center">
+          <div className="mt-8 text-center">
             <Link
               href="/generation"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-dai-green"

@@ -1,13 +1,49 @@
 import Link from "next/link";
+import Image from "next/image";
 import { BookOpen, Users, MapPin, MessageCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getArticles } from "@/lib/api";
 import type { Article } from "@/lib/types";
 import type { Metadata } from "next";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://shenshi-family.miegoat.club";
+
 export const metadata: Metadata = {
   description: "传承千年文脉，连接全球宗亲。探索沈氏文化、查询字辈堂号、与全球宗亲交流互动。",
+  keywords: ["沈氏文化家园", "沈氏字辈大全", "沈氏家谱", "沈姓名人", "吴兴沈氏", "沈氏寻根", "沈氏宗亲", "家谱查询"],
+  openGraph: {
+    title: "沈氏文化家园 - 沈氏字辈查询·名人堂·堂号百科·全球宗亲交流平台",
+    description: "传承千年文脉，连接全球宗亲。探索沈氏文化、查询字辈堂号、与全球宗亲交流互动。",
+  },
 };
+
+/* Province quick-links data */
+const MUNICIPALITIES = new Set(["上海", "北京", "天津", "重庆"]);
+
+const PROVINCE_GROUPS: Record<string, string[]> = {
+  华东: ["上海", "江苏", "浙江", "安徽", "福建", "江西", "山东"],
+  华中: ["河南", "湖北", "湖南"],
+  华南: ["广东", "广西", "海南"],
+  华北: ["北京", "天津", "河北", "山西", "内蒙古"],
+  东北: ["辽宁", "吉林", "黑龙江"],
+  西南: ["重庆", "四川", "贵州", "云南", "西藏"],
+  西北: ["陕西", "甘肃", "青海", "宁夏", "新疆"],
+  其他: ["台湾", "香港", "澳门"],
+};
+
+const ALL_PROVINCES = Object.values(PROVINCE_GROUPS).flat();
+
+function formatProvince(base: string): string {
+  if (MUNICIPALITIES.has(base)) return `${base}市`;
+  if (base === "内蒙古") return "内蒙古自治区";
+  if (base === "广西") return "广西壮族自治区";
+  if (base === "西藏") return "西藏自治区";
+  if (base === "宁夏") return "宁夏回族自治区";
+  if (base === "新疆") return "新疆维吾尔自治区";
+  if (base === "香港") return "香港特别行政区";
+  if (base === "澳门") return "澳门特别行政区";
+  return `${base}省`;
+}
 
 const quickLinks = [
   {
@@ -54,9 +90,42 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "沈氏文化家园",
+            url: SITE_URL,
+            description: "全球沈氏宗亲的文化社区与寻根平台",
+            potentialAction: {
+              "@type": "SearchAction",
+              target: `${SITE_URL}/generation?verse={search_term_string}`,
+              "query-input": "required name=search_term_string",
+            },
+            publisher: {
+              "@type": "Organization",
+              name: "沈氏文化家园",
+              logo: {
+                "@type": "ImageObject",
+                url: `${SITE_URL}/icon.png`,
+              },
+            },
+          }),
+        }}
+      />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-cream via-cream-dark to-warm-wood-light/20 py-20 md:py-32">
-        <div className="container px-4 md:px-6">
+        {/* Background watermark */}
+        <Image
+          src="/img/logo-dragon.webp"
+          alt=""
+          fill
+          className="pointer-events-none object-cover opacity-[0.06] select-none"
+        />
+        <div className="container relative z-10 px-4 md:px-6">
           <div className="flex flex-col items-center text-center">
             <h1 className="font-heading text-4xl font-bold tracking-tight text-dai-green sm:text-5xl md:text-6xl">
               沈氏文化家园
@@ -222,6 +291,26 @@ export default async function HomePage() {
             >
               查看更多家训
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Province Quick Links */}
+      <section className="border-t bg-cream py-10 md:py-14">
+        <div className="container max-w-4xl px-4 md:px-6">
+          <h2 className="mb-6 text-center font-heading text-xl font-semibold md:text-2xl">
+            各省份沈氏字辈大全
+          </h2>
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-2">
+            {ALL_PROVINCES.map((p) => (
+              <Link
+                key={p}
+                href={`/generation/${encodeURIComponent(formatProvince(p))}`}
+                className="text-sm transition-colors hover:text-dai-green"
+              >
+                {formatProvince(p)}沈氏字辈
+              </Link>
+            ))}
           </div>
         </div>
       </section>
