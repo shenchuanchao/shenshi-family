@@ -50,7 +50,7 @@ const quickLinks = [
     name: "名人堂",
     description: "探索沈氏历史上的杰出人物",
     icon: Users,
-    href: "/celebrity",
+    href: "/celebrities",
     color: "text-warm-wood",
   },
   {
