@@ -1,11 +1,19 @@
 // Run once to add role/status/author_id columns
-// Usage: node scripts/migrate-permissions.mjs
+// Usage: SUPABASE_URL=xxx SUPABASE_SERVICE_KEY=xxx node scripts/migrate-permissions.mjs
 
 import { createClient } from "@supabase/supabase-js";
 
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+
+if (!SUPABASE_URL || !SERVICE_KEY) {
+  console.error("Missing SUPABASE_URL or SUPABASE_SERVICE_KEY environment variable");
+  process.exit(1);
+}
+
 const supabase = createClient(
-  "https://ijmexvfsskfckmwlkynn.supabase.co",
-  "REDACTED_SERVICE_KEY",
+  SUPABASE_URL,
+  SERVICE_KEY,
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 

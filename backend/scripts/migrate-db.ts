@@ -1,8 +1,15 @@
 import { createClient } from "@supabase/supabase-js";
 import pg from "pg";
 
-const SUPABASE_URL = "https://ijmexvfsskfckmwlkynn.supabase.co";
-const SERVICE_KEY = "REDACTED_SERVICE_KEY";
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+
+if (!SUPABASE_URL || !SERVICE_KEY) {
+  console.error("Missing SUPABASE_URL or SUPABASE_SERVICE_KEY environment variable");
+  process.exit(1);
+}
+
+const PROJECT_REF = SUPABASE_URL.match(/https:\/\/(.+)\.supabase\.co/)?.[1] || "";
 
 // Try via supabase-js management API
 async function tryMgmtApi() {
@@ -35,10 +42,10 @@ async function tryMgmtApi() {
 async function tryPgDirect() {
   // Supabase direct connection using pooler
   const poolerConfig = {
-    host: "aws-0-ap-southeast-1.pooler.supabase.com",
+    host: `aws-0-ap-southeast-1.pooler.supabase.com`,
     port: 6543,
     database: "postgres",
-    user: "postgres.ijmexvfsskfckmwlkynn",
+    user: `postgres.${PROJECT_REF}`,
     password: SERVICE_KEY,
     ssl: { rejectUnauthorized: false },
   };
@@ -68,7 +75,7 @@ async function tryPgDirect() {
     
     // Try session mode (port 5432)
     const sessionConfig = {
-      host: "db.ijmexvfsskfckmwlkynn.supabase.co",
+      host: `db.${PROJECT_REF}.supabase.co`,
       port: 5432,
       database: "postgres",
       user: "postgres",
