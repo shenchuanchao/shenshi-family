@@ -18,7 +18,7 @@ export async function generateMetadata({
   const { province } = await params;
   const p = decodeURIComponent(province);
   return {
-    title: `${p}沈氏字辈大全`,
+    title: `${p}沈氏字辈大全 | 沈氏文化家园 - 沈氏字辈查询·堂号百科·宗亲交流`,
     description: `${p}沈氏字辈大全，收录${p}地区各支系沈氏字辈信息，查询您的辈分与家族渊源。`,
     keywords: [`${p}沈氏字辈`, "沈氏字辈大全", "字辈查询", `${p}沈氏`, "沈氏家谱"],
   };
