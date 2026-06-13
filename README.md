@@ -9,7 +9,7 @@
 - **数据库**: Supabase PostgreSQL
 - **存储**: Supabase Storage
 - **认证**: 自建 JWT (bcrypt + @nestjs/jwt + passport-jwt)
-- **部署**: Windows Server + IIS 反向代理 + PM2
+- **部署**: Windows Server + IIS 反向代理 + PM2 + Caddy
 
 ## 项目结构
 
