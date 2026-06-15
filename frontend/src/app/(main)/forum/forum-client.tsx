@@ -172,6 +172,63 @@ function ForumContent({ posts: initialPosts, total: initialTotal }: ForumClientP
       {/* Post List */}
       <section className="py-8 md:py-12">
         <div className="container max-w-3xl px-4 md:px-6">
+          {/* Publish button */}
+          <div className="mb-6 flex justify-center">
+              <Dialog open={dialogOpen} onOpenChange={(open) => {
+                if (open && !isAuthenticated) {
+                  toast.error("请先登录后再发帖");
+                  return;
+                }
+                setDialogOpen(open);
+              }}>
+                <DialogTrigger
+                  render={
+                    <Button>
+                      <PenLine className="mr-2 size-4" />
+                      发布留言
+                    </Button>
+                  }
+                />
+                <DialogContent className="sm:max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle>发布新留言</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="forum-title">标题</Label>
+                      <Input
+                        id="forum-title"
+                        placeholder="请输入留言标题"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        maxLength={100}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>内容</Label>
+                      <RichTextEditor
+                        content={content}
+                        onChange={setContent}
+                        placeholder="写下你想说的话..."
+                        minHeight={160}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setDialogOpen(false)}
+                    >
+                      取消
+                    </Button>
+                    <Button onClick={handleSubmit} disabled={submitting}>
+                      {submitting ? "发布中..." : "发布"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+
           {loading ? (
             <div className="space-y-4">
               {Array.from({ length: 5 }).map((_, i) => (

@@ -13,7 +13,7 @@ const PROJECT_REF = SUPABASE_URL.match(/https:\/\/(.+)\.supabase\.co/)?.[1] || "
 
 // Try via supabase-js management API
 async function tryMgmtApi() {
-  const projectRef = SUPABASE_URL.match(/https:\/\/(.+)\.supabase\.co/)?.[1];
+  const projectRef = SUPABASE_URL!.match(/https:\/\/(.+)\.supabase\.co/)?.[1];
   if (!projectRef) throw new Error("Cannot parse project ref");
 
   const res = await fetch(

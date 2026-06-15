@@ -307,7 +307,7 @@ export async function uploadGalleryImage(
   token: string
 ) {
   const formData = new FormData();
-  formData.append("file", file);
+  formData.append("image", file);
   formData.append("description", description);
 
   return request<GalleryImage>("/api/gallery", {

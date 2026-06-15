@@ -39,6 +39,9 @@ export class GalleryService {
 
     const storage = this.supabaseService.getClient().storage;
 
+    // Ensure the bucket exists before uploading
+    await this.ensureBucket(storage);
+
     // Upload file to Supabase Storage
     const { error: uploadError } = await storage
       .from(this.BUCKET)
@@ -97,6 +100,18 @@ export class GalleryService {
     if (updateError) throw updateError;
 
     return updated;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async ensureBucket(storage: any) {
+    const { data: buckets } = await storage.listBuckets();
+    const exists = buckets?.some((b) => b.name === this.BUCKET);
+    if (!exists) {
+      const { error } = await storage.createBucket(this.BUCKET, {
+        public: true,
+      });
+      if (error) throw error;
+    }
   }
 
   private extractExtension(filename: string): string {

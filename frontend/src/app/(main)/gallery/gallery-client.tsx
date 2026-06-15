@@ -13,6 +13,7 @@ import {
   Card,
   CardContent,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -169,6 +170,69 @@ export default function GalleryClient({ images: initialImages, total: initialTot
       {/* Image Grid */}
       <section className="py-8 md:py-12">
         <div className="container px-4 md:px-6">
+          {/* Upload button */}
+          <div className="mb-6 flex justify-center">
+              <Dialog open={dialogOpen} onOpenChange={(open) => {
+                if (open && !isAuthenticated) {
+                  toast.error("请先登录后再上传");
+                  return;
+                }
+                setDialogOpen(open);
+              }}>
+                <DialogTrigger
+                  render={
+                    <Button>
+                      <Upload className="mr-2 size-4" />
+                      上传影像
+                    </Button>
+                  }
+                />
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>上传影像</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="gallery-file">选择图片</Label>
+                      <Input
+                        id="gallery-file"
+                        type="file"
+                        accept="image/*"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                      />
+                      {selectedFile && (
+                        <p className="text-xs text-muted-foreground">
+                          已选择: {selectedFile.name}
+                        </p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="gallery-desc">图片描述</Label>
+                      <Textarea
+                        id="gallery-desc"
+                        placeholder="简单描述这张图片的故事..."
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={3}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setDialogOpen(false)}
+                    >
+                      取消
+                    </Button>
+                    <Button onClick={handleUpload} disabled={submitting || !selectedFile}>
+                      {submitting ? "上传中..." : "上传"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+
           {loading ? (
             <div className="columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4">
               {Array.from({ length: 8 }).map((_, i) => (
