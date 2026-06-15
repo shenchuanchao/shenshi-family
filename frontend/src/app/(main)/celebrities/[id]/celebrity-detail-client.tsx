@@ -86,7 +86,17 @@ export function CelebrityDetailClient({ article }: { article: Article }) {
           <span className="flex items-center gap-1 text-sm text-muted-foreground"><Heart className="h-4 w-4" />{likes}</span>
         </div>
       </header>
-      {article.cover_image && (<div className="mb-10 overflow-hidden rounded-xl"><img src={article.cover_image} alt={article.title} className="w-full object-cover" /></div>)}
+      {article.cover_image && (
+        <div className="mb-10 flex justify-center">
+          <div className="overflow-hidden rounded-xl">
+            <img
+              src={article.cover_image}
+              alt={article.title}
+              className="max-h-[480px] w-auto object-contain"
+            />
+          </div>
+        </div>
+      )}
       <article className="mb-10">
         <div className="space-y-5 text-base leading-relaxed text-foreground/90">
           {paragraphs.map((p, i) => (<p key={i}>{p}</p>))}

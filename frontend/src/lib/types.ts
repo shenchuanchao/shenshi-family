@@ -73,8 +73,11 @@ export interface GalleryImage {
   id: string;
   user_id: string;
   image_url: string;
+  storage_path?: string;
   description?: string;
   likes: number;
+  status?: string;
+  reject_reason?: string;
   created_at: string;
 }
 

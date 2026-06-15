@@ -130,12 +130,14 @@ export function NewsDetailClient({ article: initialArticle }: { article: Article
 
       {/* Cover Image */}
       {article.cover_image && (
-        <div className="mb-10 overflow-hidden rounded-xl">
-          <img
-            src={article.cover_image}
-            alt={article.title}
-            className="w-full object-cover"
-          />
+        <div className="mb-10 flex justify-center">
+          <div className="overflow-hidden rounded-xl">
+            <img
+              src={article.cover_image}
+              alt={article.title}
+              className="max-h-[480px] w-auto object-contain"
+            />
+          </div>
         </div>
       )}
 

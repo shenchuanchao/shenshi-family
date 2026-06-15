@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useEffect } from "react";
+import { useCallback, useRef, useEffect, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import ImageExtension from "@tiptap/extension-image";
@@ -16,6 +16,7 @@ import {
   List,
   Link2,
   ImagePlus,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +37,8 @@ export interface RichTextEditorProps {
   className?: string;
   /** Minimum height of the editor area */
   minHeight?: string;
+  /** Called with a File when user picks an image; should return the uploaded URL */
+  onImageUpload?: (file: File) => Promise<string>;
 }
 
 // ---------------------------------------------------------------------------
@@ -45,11 +48,13 @@ export interface RichTextEditorProps {
 function ToolbarButton({
   onClick,
   active = false,
+  disabled = false,
   children,
   title,
 }: {
   onClick: () => void;
   active?: boolean;
+  disabled?: boolean;
   children: React.ReactNode;
   title: string;
 }) {
@@ -58,8 +63,10 @@ function ToolbarButton({
       type="button"
       onClick={onClick}
       title={title}
+      disabled={disabled}
       className={cn(
         "inline-flex h-8 w-8 items-center justify-center rounded-md text-sm transition-colors",
+        disabled && "opacity-50 cursor-not-allowed",
         active
           ? "bg-dai-green text-cream"
           : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -81,8 +88,11 @@ export function RichTextEditor({
   editable = true,
   className,
   minHeight = "200px",
+  onImageUpload,
 }: RichTextEditorProps) {
   const linkInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -147,13 +157,50 @@ export function RichTextEditor({
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   }, [editor]);
 
-  const addImage = useCallback(() => {
+  // Handle image insertion: local upload if onImageUpload provided, else URL prompt
+  const handleImageButton = useCallback(() => {
     if (!editor) return;
-    const url = window.prompt("请输入图片URL", "https://");
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
+    if (onImageUpload) {
+      // Open file picker
+      fileInputRef.current?.click();
+    } else {
+      // Fallback: prompt for URL
+      const url = window.prompt("请输入图片URL", "https://");
+      if (url) {
+        editor.chain().focus().setImage({ src: url }).run();
+      }
     }
-  }, [editor]);
+  }, [editor, onImageUpload]);
+
+  // Handle file input change
+  const handleFileChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file || !editor || !onImageUpload) return;
+
+      // Validate
+      if (!file.type.startsWith("image/")) {
+        alert("请选择图片文件");
+        return;
+      }
+
+      setUploading(true);
+      try {
+        const url = await onImageUpload(file);
+        editor.chain().focus().setImage({ src: url }).run();
+      } catch (err) {
+        console.error("Image upload failed:", err);
+        alert("图片上传失败，请稍后重试");
+      } finally {
+        setUploading(false);
+        // Reset input so the same file can be selected again
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      }
+    },
+    [editor, onImageUpload]
+  );
 
   if (!editor) {
     return null;
@@ -167,6 +214,15 @@ export function RichTextEditor({
         className
       )}
     >
+      {/* Hidden file input for image upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+
       {/* Toolbar */}
       {editable && (
         <div className="flex flex-wrap items-center gap-0.5 border-b border-border px-2 py-1.5">
@@ -232,8 +288,16 @@ export function RichTextEditor({
           >
             <Link2 className="size-4" />
           </ToolbarButton>
-          <ToolbarButton onClick={addImage} title="插入图片">
-            <ImagePlus className="size-4" />
+          <ToolbarButton
+            onClick={handleImageButton}
+            disabled={uploading}
+            title={onImageUpload ? "上传图片" : "插入图片"}
+          >
+            {uploading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <ImagePlus className="size-4" />
+            )}
           </ToolbarButton>
         </div>
       )}

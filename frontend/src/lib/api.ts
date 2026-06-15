@@ -324,6 +324,61 @@ export async function likeGalleryImage(id: string, token: string) {
   });
 }
 
+export async function getPendingGalleryImages(token: string, params?: {
+  page?: number;
+  limit?: number;
+}) {
+  return request<PaginatedResponse<GalleryImage>>(
+    `/api/gallery/pending${qs(params)}`,
+    { token }
+  );
+}
+
+export async function getMyGalleryUploads(token: string, params?: {
+  page?: number;
+  limit?: number;
+}) {
+  return request<PaginatedResponse<GalleryImage>>(
+    `/api/gallery/my${qs(params)}`,
+    { token }
+  );
+}
+
+export async function reviewGalleryImage(
+  id: string,
+  action: "approve" | "reject",
+  token: string,
+  reason?: string
+) {
+  return request<GalleryImage>(`/api/gallery/${id}/review`, {
+    method: "POST",
+    token,
+    body: JSON.stringify({ action, reason }),
+  });
+}
+
+export async function deleteGalleryImage(id: string, token: string) {
+  return request<{ message: string }>(`/api/gallery/${id}`, {
+    method: "DELETE",
+    token,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Upload
+// ---------------------------------------------------------------------------
+
+export async function uploadImage(file: File, token: string) {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  return request<{ url: string; path: string }>("/api/upload/image", {
+    method: "POST",
+    token,
+    body: formData,
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Generation Verse & Tanghao
 // ---------------------------------------------------------------------------

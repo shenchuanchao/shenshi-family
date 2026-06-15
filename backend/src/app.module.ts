@@ -7,6 +7,7 @@ import { ArticlesModule } from './articles/articles.module';
 import { ForumModule } from './forum/forum.module';
 import { GalleryModule } from './gallery/gallery.module';
 import { GenerationModule } from './generation/generation.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { GenerationModule } from './generation/generation.module';
     ForumModule,
     GalleryModule,
     GenerationModule,
+    UploadModule,
   ],
   controllers: [AppController],
 })

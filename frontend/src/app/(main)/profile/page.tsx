@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -12,11 +12,15 @@ import {
   TreePine,
   Clock,
   Save,
+  Trash2,
+  CheckCircle2,
+  XCircle,
+  Loader2,
 } from "lucide-react";
 
 import { useAuth } from "@/lib/auth-context";
-import { getTanghaoList } from "@/lib/api";
-import type { Tanghao } from "@/lib/types";
+import { getTanghaoList, getMyGalleryUploads, deleteGalleryImage } from "@/lib/api";
+import type { Tanghao, GalleryImage } from "@/lib/types";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,13 +31,14 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, isAuthenticated, loading: authLoading, updateUser } = useAuth();
+  const { user, isAuthenticated, token, loading: authLoading, updateUser } = useAuth();
 
   const [activeTab, setActiveTab] = useState("profile");
 
@@ -48,6 +53,13 @@ export default function ProfilePage() {
   // Tanghao list
   const [tanghaoList, setTanghaoList] = useState<Tanghao[]>([]);
   const [tanghaoLoading, setTanghaoLoading] = useState(false);
+
+  // Gallery uploads
+  const [uploads, setUploads] = useState<GalleryImage[]>([]);
+  const [uploadsLoading, setUploadsLoading] = useState(false);
+  const [uploadsTotal, setUploadsTotal] = useState(0);
+  const [uploadActionLoading, setUploadActionLoading] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<GalleryImage | null>(null);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -77,6 +89,44 @@ export default function ProfilePage() {
       })
       .finally(() => setTanghaoLoading(false));
   }, []);
+
+  // Fetch my gallery uploads
+  const fetchUploads = useCallback(async () => {
+    if (!token || !isAuthenticated) return;
+    setUploadsLoading(true);
+    try {
+      const res = await getMyGalleryUploads(token, { page: 1, limit: 50 });
+      setUploads(res.data ?? []);
+      setUploadsTotal(res.total ?? 0);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "加载上传记录失败";
+      toast.error(msg);
+    } finally {
+      setUploadsLoading(false);
+    }
+  }, [token, isAuthenticated]);
+
+  useEffect(() => {
+    if (activeTab === "uploads" && isAuthenticated) {
+      fetchUploads();
+    }
+  }, [activeTab, fetchUploads, isAuthenticated]);
+
+  const handleDeleteUpload = async (id: string) => {
+    if (!confirm("确定要删除这张影像吗？")) return;
+    setUploadActionLoading(id);
+    try {
+      await deleteGalleryImage(id, token!);
+      toast.success("影像已删除");
+      setUploads((prev) => prev.filter((img) => img.id !== id));
+      setUploadsTotal((prev) => prev - 1);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "删除失败";
+      toast.error(msg);
+    } finally {
+      setUploadActionLoading(null);
+    }
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -288,19 +338,99 @@ export default function ProfilePage() {
 
         {/* ---- My Uploads Tab ---- */}
         <TabsContent value="uploads">
-          <Card>
-            <CardContent className="flex flex-col items-center py-16">
-              <div className="flex size-14 items-center justify-center rounded-full bg-dai-green/10">
-                <ImageIcon className="size-6 text-dai-green" />
+          {uploadsLoading ? (
+            <div className="grid gap-3 grid-cols-4 sm:grid-cols-5 lg:grid-cols-6">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton className="aspect-square w-full rounded-lg" />
+                  <Skeleton className="h-3 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+              ))}
+            </div>
+          ) : uploads.length === 0 ? (
+            <Card>
+              <CardContent className="flex flex-col items-center py-16">
+                <div className="flex size-14 items-center justify-center rounded-full bg-dai-green/10">
+                  <ImageIcon className="size-6 text-dai-green" />
+                </div>
+                <p className="mt-4 text-base font-medium text-muted-foreground">
+                  还没有上传记录
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground/70">
+                  前往影像馆上传您的第一张家族照片吧
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                共上传了 <span className="font-medium text-foreground">{uploadsTotal}</span> 张影像
+              </p>
+              <div className="grid gap-3 grid-cols-4 sm:grid-cols-5 lg:grid-cols-6">
+                {uploads.map((image) => (
+                  <Card key={image.id} className="overflow-hidden">
+                    <div
+                      className="relative cursor-pointer group"
+                      onClick={() => setPreviewImage(image)}
+                    >
+                      <img
+                        src={image.image_url}
+                        alt={image.description ?? "我的上传"}
+                        className="aspect-square w-full object-cover transition-opacity group-hover:opacity-90"
+                        loading="lazy"
+                      />
+                      {/* Status overlay badge */}
+                      <div className="absolute left-1.5 top-1.5">
+                        {image.status === "approved" ? (
+                          <Badge className="bg-green-500/90 text-white border-0 text-xs gap-1">
+                            <CheckCircle2 className="size-3" />
+                            已通过
+                          </Badge>
+                        ) : image.status === "rejected" ? (
+                          <Badge className="bg-red-500/90 text-white border-0 text-xs gap-1">
+                            <XCircle className="size-3" />
+                            已驳回
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-yellow-500/90 text-white border-0 text-xs gap-1">
+                            <Loader2 className="size-3" />
+                            审核中
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                    <CardContent className="py-2 px-2.5">
+                      {image.description && (
+                        <p className="mb-1 text-xs leading-relaxed text-muted-foreground line-clamp-1">
+                          {image.description}
+                        </p>
+                      )}
+                      {image.status === "rejected" && image.reject_reason && (
+                        <p className="mb-1 text-[10px] text-red-500 line-clamp-1">
+                          驳回：{image.reject_reason}
+                        </p>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-muted-foreground">
+                          {new Date(image.created_at).toLocaleDateString("zh-CN")}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-5 px-1.5 text-[10px] text-red-400 hover:bg-red-50 hover:text-red-500"
+                          onClick={() => handleDeleteUpload(image.id)}
+                          disabled={uploadActionLoading === image.id}
+                        >
+                          <Trash2 className="size-2.5" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-              <p className="mt-4 text-base font-medium text-muted-foreground">
-                功能开发中...
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground/70">
-                即将支持管理您上传的所有影像
-              </p>
-            </CardContent>
-          </Card>
+            </div>
+          )}
         </TabsContent>
 
         {/* ---- Family Tree Tab ---- */}
@@ -332,6 +462,34 @@ export default function ProfilePage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* ── Image Preview Modal ── */}
+      {previewImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div className="relative max-h-[90vh] max-w-3xl" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={previewImage.image_url}
+              alt={previewImage.description ?? "影像预览"}
+              className="max-h-[80vh] w-auto rounded-lg object-contain"
+            />
+            {previewImage.description && (
+              <p className="mt-3 text-center text-sm text-white/80">
+                {previewImage.description}
+              </p>
+            )}
+            <button
+              type="button"
+              className="absolute -right-2 -top-2 flex size-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/40"
+              onClick={() => setPreviewImage(null)}
+            >
+              <XCircle className="size-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,14 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
-import { FileText, Send, ArrowLeft, Loader2 } from "lucide-react";
+import { FileText, Send, ArrowLeft, Loader2, Upload, X, ImagePlus } from "lucide-react";
 import Link from "next/link";
 
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { useAuth } from "@/lib/auth-context";
-import { getArticle, updateArticle } from "@/lib/api";
+import { getArticle, updateArticle, uploadImage } from "@/lib/api";
 import { RichTextEditor } from "@/components/editor/rich-text-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,9 +38,11 @@ export default function EditArticlePage() {
   const [dynasty, setDynasty] = useState("");
   const [field, setField] = useState("");
   const [coverImage, setCoverImage] = useState("");
+  const [coverUploading, setCoverUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   const fetchArticle = useCallback(async () => {
     setLoading(true);
@@ -62,6 +64,38 @@ export default function EditArticlePage() {
   useEffect(() => {
     fetchArticle();
   }, [fetchArticle]);
+
+  // Upload cover image from local file
+  const handleCoverFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("请选择图片文件");
+      return;
+    }
+    setCoverUploading(true);
+    try {
+      const result = await uploadImage(file, token);
+      setCoverImage(result.url);
+      toast.success("封面上传成功");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "封面上传失败";
+      toast.error(msg);
+    } finally {
+      setCoverUploading(false);
+      if (coverInputRef.current) coverInputRef.current.value = "";
+    }
+  };
+
+  // Image upload handler for rich text editor
+  const handleEditorImageUpload = useCallback(
+    async (file: File): Promise<string> => {
+      if (!token) throw new Error("请先登录");
+      const result = await uploadImage(file, token);
+      return result.url;
+    },
+    [token]
+  );
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -200,15 +234,58 @@ export default function EditArticlePage() {
             </div>
           </div>
 
-          {/* Cover image */}
+          {/* Cover image — file upload + URL */}
           <div className="space-y-2">
-            <Label htmlFor="article-cover">封面图片链接（可选）</Label>
-            <Input
-              id="article-cover"
-              placeholder="https://..."
-              value={coverImage}
-              onChange={(e) => setCoverImage(e.target.value)}
-            />
+            <Label>封面图片（可选）</Label>
+            <div className="flex items-center gap-2">
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleCoverFileChange}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => coverInputRef.current?.click()}
+                disabled={coverUploading}
+              >
+                <Upload className="size-3.5" />
+                {coverUploading ? "上传中..." : "上传图片"}
+              </Button>
+              <Input
+                id="article-cover"
+                placeholder="或粘贴图片链接 https://..."
+                value={coverImage}
+                onChange={(e) => setCoverImage(e.target.value)}
+                className="flex-1"
+              />
+              {coverImage && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setCoverImage("")}
+                >
+                  <X className="size-3.5" />
+                </Button>
+              )}
+            </div>
+            {coverImage && (
+              <div className="mt-2 flex items-center gap-3">
+                <img
+                  src={coverImage}
+                  alt="封面预览"
+                  className="h-20 rounded-lg border border-border object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
+                />
+                <span className="text-xs text-muted-foreground">封面预览</span>
+              </div>
+            )}
           </div>
 
           {/* Rich Text Editor */}
@@ -219,7 +296,12 @@ export default function EditArticlePage() {
               onChange={setContent}
               placeholder="编辑文章内容..."
               minHeight="360px"
+              onImageUpload={handleEditorImageUpload}
             />
+            <p className="text-xs text-muted-foreground">
+              <ImagePlus className="mr-1 inline size-3" />
+              点击工具栏图片按钮可上传本地图片
+            </p>
           </div>
 
           {/* Submit */}

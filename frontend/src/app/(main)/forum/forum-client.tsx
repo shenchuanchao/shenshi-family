@@ -210,7 +210,7 @@ function ForumContent({ posts: initialPosts, total: initialTotal }: ForumClientP
                         content={content}
                         onChange={setContent}
                         placeholder="写下你想说的话..."
-                        minHeight={160}
+                        minHeight="160px"
                       />
                     </div>
                   </div>
