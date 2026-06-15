@@ -99,7 +99,7 @@ export function Header() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Link href="/articles/new" className="flex items-center w-full">
+                    <Link href="/articles" className="flex items-center w-full">
                       <Send className="mr-2 h-4 w-4" />
                       立即投稿
                     </Link>
@@ -164,7 +164,7 @@ export function Header() {
                       个人中心
                     </Link>
                     <Link
-                      href="/articles/new"
+                      href="/articles"
                       onClick={() => setMobileOpen(false)}
                       className="flex items-center gap-2 py-2 text-sm text-muted-foreground hover:text-dai-green"
                     >
