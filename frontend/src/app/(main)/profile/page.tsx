@@ -228,7 +228,7 @@ export default function ProfilePage() {
                   </Label>
                   <Input
                     id="profile-hometown"
-                    placeholder="例如：浙江湖州"
+                    placeholder="例如：陕西安康"
                     value={hometown}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setHometown(e.target.value)

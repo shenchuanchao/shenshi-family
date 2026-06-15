@@ -80,7 +80,7 @@ export default function ContactPage() {
                     <div>
                       <p className="text-sm font-medium">地址</p>
                       <p className="text-sm text-muted-foreground">
-                        浙江省湖州市吴兴区
+                        陕西省安康市汉滨区关庙镇
                       </p>
                     </div>
                   </div>

@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Heart,
   Eye,
   MessageCircle,
   Send,
   User as UserIcon,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   Card,
@@ -22,7 +25,15 @@ import { useAuth } from "@/lib/auth-context";
 import { likeArticle, addComment } from "@/lib/api";
 import type { Article, Comment } from "@/lib/types";
 
-export function CelebrityDetailClient({ article }: { article: Article }) {
+export function CelebrityDetailClient({
+  article,
+  prevArticle,
+  nextArticle,
+}: {
+  article: Article;
+  prevArticle?: Article | null;
+  nextArticle?: Article | null;
+}) {
   const router = useRouter();
   const { user, token, isAuthenticated } = useAuth();
 
@@ -134,6 +145,47 @@ export function CelebrityDetailClient({ article }: { article: Article }) {
           <div className="py-10 text-center"><MessageCircle className="mx-auto h-8 w-8 text-muted-foreground/30" /><p className="mt-3 text-sm text-muted-foreground">暂无评论，来发表第一条评论吧</p></div>
         )}
       </section>
+
+      {/* Prev / Next Article Navigation */}
+      {(prevArticle || nextArticle) && (
+        <>
+          <Separator className="my-8" />
+          <nav className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+            {prevArticle ? (
+              <Link
+                href={`/celebrities/${prevArticle.id}`}
+                className="group flex flex-1 items-center gap-3 rounded-xl border border-border bg-card p-4 transition-shadow hover:shadow-md"
+              >
+                <ChevronLeft className="size-5 shrink-0 text-muted-foreground transition-colors group-hover:text-dai-green" />
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground">上一篇</p>
+                  <p className="truncate text-sm font-medium text-foreground group-hover:text-dai-green">
+                    {prevArticle.title}
+                  </p>
+                </div>
+              </Link>
+            ) : (
+              <div className="flex-1" />
+            )}
+            {nextArticle ? (
+              <Link
+                href={`/celebrities/${nextArticle.id}`}
+                className="group flex flex-1 items-center justify-end gap-3 rounded-xl border border-border bg-card p-4 text-right transition-shadow hover:shadow-md"
+              >
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground">下一篇</p>
+                  <p className="truncate text-sm font-medium text-foreground group-hover:text-dai-green">
+                    {nextArticle.title}
+                  </p>
+                </div>
+                <ChevronRight className="size-5 shrink-0 text-muted-foreground transition-colors group-hover:text-dai-green" />
+              </Link>
+            ) : (
+              <div className="flex-1" />
+            )}
+          </nav>
+        </>
+      )}
     </div>
   );
 }

@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
   Heart,
   Eye,
   MessageCircle,
@@ -30,7 +33,15 @@ const CATEGORY_LABELS: Record<string, string> = {
   genealogy: "族谱",
 };
 
-export function NewsDetailClient({ article: initialArticle }: { article: Article }) {
+export function NewsDetailClient({
+  article: initialArticle,
+  prevArticle,
+  nextArticle,
+}: {
+  article: Article;
+  prevArticle?: Article | null;
+  nextArticle?: Article | null;
+}) {
   const router = useRouter();
   const { user, token, isAuthenticated } = useAuth();
 
@@ -261,6 +272,47 @@ export function NewsDetailClient({ article: initialArticle }: { article: Article
           </div>
         )}
       </section>
+        </>
+      )}
+
+      {/* Prev / Next Article Navigation */}
+      {(prevArticle || nextArticle) && (
+        <>
+          <Separator className="my-8" />
+          <nav className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+            {prevArticle ? (
+              <Link
+                href={`/news/${prevArticle.id}`}
+                className="group flex flex-1 items-center gap-3 rounded-xl border border-border bg-card p-4 transition-shadow hover:shadow-md"
+              >
+                <ChevronLeft className="size-5 shrink-0 text-muted-foreground transition-colors group-hover:text-dai-green" />
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground">上一篇</p>
+                  <p className="truncate text-sm font-medium text-foreground group-hover:text-dai-green">
+                    {prevArticle.title}
+                  </p>
+                </div>
+              </Link>
+            ) : (
+              <div className="flex-1" />
+            )}
+            {nextArticle ? (
+              <Link
+                href={`/news/${nextArticle.id}`}
+                className="group flex flex-1 items-center justify-end gap-3 rounded-xl border border-border bg-card p-4 text-right transition-shadow hover:shadow-md"
+              >
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground">下一篇</p>
+                  <p className="truncate text-sm font-medium text-foreground group-hover:text-dai-green">
+                    {nextArticle.title}
+                  </p>
+                </div>
+                <ChevronRight className="size-5 shrink-0 text-muted-foreground transition-colors group-hover:text-dai-green" />
+              </Link>
+            ) : (
+              <div className="flex-1" />
+            )}
+          </nav>
         </>
       )}
     </div>

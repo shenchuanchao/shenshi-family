@@ -117,14 +117,6 @@ CREATE TABLE shen_generation_verses (
 -- 种子数据
 -- ============================================================
 
--- 字辈数据
-INSERT INTO shen_generation_verses (branch_name, verses, region, description) VALUES
-('吴兴沈氏', '克明峻德，允升于天，维皇作极，用锡尔福', '浙江湖州', '吴兴郡沈氏，为沈氏正统支系'),
-('三善堂沈氏', '仁义礼智信，忠孝廉节勇', '江西', '宋代沈度后裔'),
-('梦溪堂沈氏', '学贯天人，道通古今', '江苏镇江', '沈括后裔支系'),
-('清音堂沈氏', '文采风流，声韵清越', '浙江', '沈约后裔支系'),
-('九如堂沈氏', '如山如阜，如冈如陵，如川之方至', '安徽', '取诗经九如之意'),
-('承志堂沈氏', '承先启后，志在千里', '湖南', '湖南沈氏支系');
 
 -- 名人文章
 INSERT INTO shen_articles (title, content, category, dynasty, field, cover_image) VALUES
