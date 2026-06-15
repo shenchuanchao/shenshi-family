@@ -140,8 +140,8 @@ export function Header() {
             }
           />
           <SheetContent side="right" className="w-72">
-            <SheetTitle>沈氏文化家园</SheetTitle>
-            <nav className="flex flex-col gap-4 mt-6">
+            <SheetTitle className="px-6 pt-3 font-bold">沈氏文化家园</SheetTitle>
+            <nav className="flex flex-col gap-4 mt-3 px-6">
               {navigation.map((item) => (
                 <Link
                   key={item.href}
