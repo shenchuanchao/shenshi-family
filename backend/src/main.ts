@@ -32,11 +32,18 @@ async function bootstrap() {
     }),
   });
 
+  // Comma-separated list in CORS_ORIGIN env var, e.g.:
+  // CORS_ORIGIN=https://site1.com,https://site2.com,https://site3.com
+  const corsOrigins = [
+    'http://localhost:3001',
+    ...(process.env.CORS_ORIGIN || '')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean),
+  ];
+
   app.enableCors({
-    origin: [
-      'http://localhost:3001',
-      process.env.CORS_ORIGIN || 'http://localhost:3001',
-    ],
+    origin: corsOrigins,
     credentials: true,
   });
 
