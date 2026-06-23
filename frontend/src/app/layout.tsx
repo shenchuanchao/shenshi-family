@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     icon: "/icon.png",
   },
   other: {
-    "baidu-site-verification": "", // 百度站长验证，获取后填入
+    "baidu-site-verification": "codeva-pIqQgurffc", // 百度站长验证，获取后填入
     "renderer": "webkit",
     "force-rendering": "webkit",
   },
