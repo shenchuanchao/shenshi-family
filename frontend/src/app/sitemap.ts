@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://shenshi-family.miegoat.club";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://shenshi-culture.coderlog.net";
 
 const PROVINCES = [
   "上海市", "江苏省", "浙江省", "安徽省", "福建省", "江西省", "山东省",

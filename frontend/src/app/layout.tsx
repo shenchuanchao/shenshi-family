@@ -3,7 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { Toaster } from "@/components/ui/sonner";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://shenshi-family.miegoat.club";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://shenshi-culture.coderlog.net";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

@@ -6,7 +6,7 @@ import { getArticles } from "@/lib/api";
 import type { Article } from "@/lib/types";
 import type { Metadata } from "next";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://shenshi-family.miegoat.club";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://shenshi-culture.coderlog.net";
 
 export const metadata: Metadata = {
   description: "传承千年文脉，连接全球宗亲。探索沈氏文化、查询字辈堂号、与全球宗亲交流互动。",
